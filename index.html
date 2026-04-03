@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#e63946">
+    <title>Uttar Gram Blood Circle</title>
+    <style>
+        :root { --primary: #e63946; --secondary: #1d3557; --success: #2a9d8f; --accent: #ffb703; }
+        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; text-align: center; color: #333; }
+        .container { flex: 1; width: 100%; max-width: 500px; margin: 0 auto; background: white; padding: 20px 15px; box-sizing: border-box; min-height: 100vh; }
+        .logo { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 10px; object-fit: cover; }
+        .clock-box { font-size: 24px; font-weight: bold; color: var(--secondary); margin-bottom: 5px; }
+        .cal-box { background: linear-gradient(135deg, #fff9c4, #fff176); border: 2px solid var(--accent); border-radius: 15px; padding: 15px; margin: 10px 0; text-align: left; }
+        .cal-line { font-size: 15px; font-weight: bold; color: #333; margin: 5px 0; border-bottom: 1px dashed #d4c000; padding-bottom: 3px; }
+        .permanent-alert { background: #fff5f5; color: #d32f2f; padding: 15px; border-radius: 15px; border: 2px solid #ffcdd2; font-size: 14px; font-weight: bold; margin: 15px 0; line-height: 1.6; text-align: left; }
+        .btn { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; margin: 8px 0; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
+        .donor-card { background: #fff; border-radius: 15px; padding: 15px; margin: 15px 0; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 5px solid var(--primary); }
+        .donor-img { width: 75px; height: 75px; border-radius: 12px; object-fit: cover; float: right; }
+        .admin-section { display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 20px; border: 2px solid #eee; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="https://i.ibb.co.com/FbYB4J3W/20241022-122323-removebg-preview.png" class="logo">
+    <h2 style="margin:0; color:var(--secondary);">উত্তর গ্রাম ব্লাড সার্কেল</h2>
+    <div class="clock-box" id="liveClock">00:00:00 PM</div>
+
+    <div class="cal-box">
+        <div id="dayName" class="cal-line">বার: লোড হচ্ছে...</div>
+        <div id="engDate" class="cal-line">ইংরেজি: লোড হচ্ছে...</div>
+        <div id="bnDate" class="cal-line">বাংলা: ১৯ চৈত্র, ১৪৩২ (বসন্তকাল)</div>
+        <div id="arDate" class="cal-line">হিজরি: লোড হচ্ছে...</div>
+    </div>
+
+    <div class="permanent-alert">
+        📢 গর্ভবতী মায়ের ডেলিভারির সময় রক্তের প্রয়োজন হয়, তাই ডেলিভারির অন্তত এক মাস আগে থেকেই দুইজন রক্তদাতা জোগাড় করে রাখুন।
+    </div>
+
+    <button class="btn" style="background: var(--success);" onclick="showForm()">➕ নতুন ডোনেশন এন্ট্রি</button>
+    <div id="entryForm" style="display:none; padding:15px; border:1px solid #ccc; border-radius:20px; margin-top:10px; background: #fafafa;">
+        <input type="hidden" id="editId">
+        <input type="text" id="mName" placeholder="ডোনারের নাম">
+        <input type="tel" id="mPhone" placeholder="মোবাইল নাম্বার">
+        <select id="mGroup">
+            <option value="">রক্তের গ্রুপ</option>
+            <option value="A+">A+</option><option value="B+">B+</option><option value="O+">O+</option><option value="AB+">AB+</option>
+            <option value="A-">A-</option><option value="B-">B-</option><option value="O-">O-</option><option value="AB-">AB-</option>
+        </select>
+        <input type="date" id="mDate">
+        <input type="file" id="mImg" accept="image/*">
+        <button class="btn" onclick="saveData()">তথ্য নিশ্চিত করুন</button>
+        <button class="btn" style="background:#888;" onclick="hideForm()">বাতিল</button>
+    </div>
+
+    <input type="text" id="searchInput" placeholder="সার্চ দিন...">
+    <button class="btn" onclick="searchData()">🔍 রক্তদাতা খুঁজুন</button>
+    <div id="results"></div>
+
+    <div style="display: flex; gap: 10px; margin-top: 15px; padding-bottom: 20px;">
+        <button class="btn" style="background: #25d366; flex:1;" onclick="shareApp()">🔗 শেয়ার করুন</button>
+        <button class="btn" style="background: var(--secondary); flex:1;" onclick="toggleAdmin()">এডমিন প্যানেল</button>
+    </div>
+
+    <div id="adminArea" class="admin-section">
+        <div id="loginBox">
+            <input type="password" id="pinInput" placeholder="এডমিন পিন দিন">
+            <button class="btn" onclick="adminLogin()">লগইন</button>
+        </div>
+        <div id="adminContent" class="hidden">
+            <div id="fullList"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let db = JSON.parse(localStorage.getItem('ugbc_v2026_final_db')) || [];
+
+    function getHijriDate(date) {
+        let julianDate = Math.floor(date.getTime() / 86400000) + 2440588;
+        let day = julianDate - 1948439;
+        let year = Math.floor(day / 354.367);
+        let month = Math.floor((day - Math.floor(year * 354.367)) / 29.5);
+        let hijriDay = day - Math.floor(year * 354.367) - Math.floor(month * 29.5) + 1;
+        let hijriYear = year + 1;
+        const hijriMonths = ["মহরম", "সফর", "রবিউল আউয়াল", "রবিউস সানি", "জমাদিউল আউয়াল", "জমাদিউস সানি", "রজব", "শাবান", "রমজান", "শাওয়াল", "জিলকদ", "জিলহজ"];
+        const toBn = n => String(n).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+        return `${toBn(hijriDay)} ${hijriMonths[month % 12]}, ${toBn(hijriYear)}`;
+    }
+
+    function updateApp() {
+        const now = new Date();
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-US', { hour12: true });
+        const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+        document.getElementById('dayName').innerText = "বার: " + days[now.getDay()];
+        document.getElementById('engDate').innerText = "ইংরেজি: " + now.toLocaleDateString('bn-BD', {day:'numeric', month:'long', year:'numeric'});
+        document.getElementById('arDate').innerText = "হিজরি: " + getHijriDate(now);
+    }
+
+    function showForm() { document.getElementById('entryForm').style.display = 'block'; }
+    function hideForm() { document.getElementById('entryForm').style.display = 'none'; }
+
+    function saveData() {
+        const id = document.getElementById('editId').value;
+        const name = document.getElementById('mName').value;
+        const phone = document.getElementById('mPhone').value;
+        const group = document.getElementById('mGroup').value;
+        const date = document.getElementById('mDate').value;
+        const file = document.getElementById('mImg').files[0];
+        if(!name || !group || !date) return alert("তথ্য দিন!");
+        const handle = (img) => {
+            if(id) {
+                const idx = db.findIndex(x => x.id == id);
+                db[idx] = { id: Number(id), name, phone, group, date, img: img || db[idx].img };
+            } else {
+                db.push({ id: Date.now(), name, phone, group, date, img });
+            }
+            localStorage.setItem('ugbc_v2026_final_db', JSON.stringify(db));
+            location.reload();
+        };
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => handle(e.target.result);
+            reader.readAsDataURL(file);
+        } else { handle(""); }
+    }
+
+    function searchData() {
+        const q = document.getElementById('searchInput').value.trim().toUpperCase();
+        const res = document.getElementById('results');
+        res.innerHTML = "";
+        db.filter(m => m.group === q || m.name.toUpperCase().includes(q)).forEach(m => {
+            const days = Math.floor((new Date() - new Date(m.date)) / (1000*60*60*24));
+            res.innerHTML += `<div class="donor-card"><img src="${m.img || 'https://via.placeholder.com/70'}" class="donor-img"><b>${m.name}</b> [${m.group}]<br>ফোন: ${m.phone}<br>রক্তদানের বয়স: ${days} দিন</div>`;
+        });
+    }
+
+    function toggleAdmin() { document.getElementById('adminArea').style.display = 'block'; }
+    function adminLogin() { if(document.getElementById('pinInput').value === "4321") { document.getElementById('loginBox').style.display='none'; document.getElementById('adminContent').classList.remove('hidden'); } }
+
+    async function shareApp() { if(navigator.share) await navigator.share({title: 'Blood App', url: window.location.href}); else alert("লিঙ্ক কপি করুন"); }
+
+    setInterval(updateApp, 1000);
+    window.onload = updateApp;
+</script>
+</body>
+</html>
