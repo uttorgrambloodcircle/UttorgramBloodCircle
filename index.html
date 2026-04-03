@@ -10,44 +10,88 @@
         :root { --primary: #e63946; --secondary: #1d3557; --success: #2a9d8f; --accent: #ffb703; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #333; }
         .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 80px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, var(--primary), #b91c1c); color: white; padding: 25px 20px; text-align: center; border-radius: 0 0 30px 30px; }
-        .logo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid white; margin-bottom: 10px; background: white; }
-        .widget-box { background: #fff; margin: 15px; padding: 15px; border-radius: 15px; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .clock { font-size: 28px; font-weight: bold; margin-bottom: 5px; letter-spacing: 1px; }
-        .date-row { font-size: 15px; font-weight: 600; color: #444; margin: 5px 0; border-bottom: 1px dashed #eee; padding-bottom: 3px; }
-        .alert-text { background: #fff5f5; color: #d32f2f; padding: 12px; margin: 10px; border-radius: 12px; border: 1px solid #feb2b2; font-size: 13px; font-weight: bold; text-align: center; }
+        .header { background: linear-gradient(135deg, var(--primary), #b91c1c); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; }
+        .logo { width: 90px; height: 90px; border-radius: 50%; border: 3px solid white; margin-bottom: 8px; background: white; }
+        .alert-text { background: #fff5f5; color: #d32f2f; padding: 12px; margin: 10px; border-radius: 12px; border: 1px solid #feb2b2; font-size: 13px; font-weight: bold; line-height: 1.5; text-align: center; }
+        .widget-box { background: #fff; margin: 10px; padding: 15px; border-radius: 15px; border: 1px solid #eee; }
+        .date-row { font-size: 14px; font-weight: bold; color: #444; margin: 4px 0; }
+        .search-container { padding: 10px; display: flex; gap: 8px; }
+        .search-container input, .search-container select { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ddd; outline: none; }
         .donor-card { background: white; border: 1px solid #eee; margin: 10px; padding: 12px; border-radius: 15px; display: flex; align-items: center; border-left: 5px solid var(--primary); }
-        .donor-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px; background: #f9f9f9; }
+        .donor-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; margin-right: 15px; background: #f9f9f9; }
+        .donor-info b { font-size: 17px; display: block; color: var(--secondary); }
+        .status-msg { color: #dc2626; font-size: 12px; font-weight: bold; margin-top: 5px; display: block; }
         .report-section { display: flex; justify-content: space-around; padding: 15px; background: var(--secondary); color: white; margin: 10px; border-radius: 15px; font-size: 12px; text-align: center; }
-        .btn { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-group { padding: 15px; display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: white; }
+        .admin-panel { display: none; padding: 15px; background: #f8f9fa; margin: 10px; border-radius: 15px; border: 1px solid #ddd; }
+        input[type="text"], input[type="date"], input[type="tel"] { width: 95%; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="header">
         <img src="https://i.ibb.co.com/FbYB4J3W/20241022-122323-removebg-preview.png" class="logo">
-        <h2 style="margin:0; font-size: 22px;">উত্তর গ্রাম ব্লাড সার্কেল</h2>
-        <div id="liveClock" class="clock">০০:০০:০০</div>
+        <h2 style="margin:0;">উত্তর গ্রাম ব্লাড সার্কেল</h2>
+        <div id="liveClock" style="font-size: 24px; font-weight: bold; margin-top: 5px;">০০:০০:০০</div>
     </div>
-    <div class="alert-text">📢 গর্ভবতী মায়ের জন্য রক্তদাতা আগে থেকেই জোগাড় রাখুন।</div>
+
+    <div class="alert-text">
+        📢 গর্ভবতী মায়ের ডেলিভারির সময় রক্তের প্রয়োজন হয়, তাই ডেলিভারির অন্তত এক মাস আগে থেকেই দুইজন রক্তদাতা জোগাড় করে রাখুন।
+    </div>
+
     <div class="widget-box">
         <div id="enD" class="date-row">লোড হচ্ছে...</div>
         <div id="bnD" class="date-row">লোড হচ্ছে...</div>
         <div id="arD" class="date-row">লোড হচ্ছে...</div>
-        <div id="dayN" style="color:var(--primary); font-weight:bold; margin-top:8px;"></div>
+        <div id="dayCount" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
+        <div id="eventToday" style="font-size: 13px; color: var(--primary); font-weight: bold;"></div>
     </div>
-    <div id="reportBox" class="report-section">
+
+    <div class="report-section">
         <div>আজকের ম্যানেজ<br><b id="repD">০</b></div>
         <div>এই মাসে মোট<br><b id="repM">০</b></div>
         <div>এই বছরে মোট<br><b id="repY">০</b></div>
     </div>
-    <div id="donorList" style="padding: 10px;">লোড হচ্ছে...</div>
+
+    <div class="search-container">
+        <input type="text" id="sName" placeholder="🔍 নাম (ইংরেজিতে)..." onkeyup="filterDonors()">
+        <select id="sGroup" onchange="filterDonors()">
+            <option value="">🩸 গ্রুপ</option>
+            <option value="A+">A+</option><option value="B+">B+</option><option value="O+">O+</option><option value="AB+">AB+</option>
+            <option value="A-">A-</option><option value="B-">B-</option><option value="O-">O-</option><option value="AB-">AB-</option>
+        </select>
+    </div>
+
+    <div id="donorList">লোড হচ্ছে...</div>
+
+    <div class="btn-group">
+        <button class="btn" style="background: var(--primary);" onclick="adminLogin()">এডমিন প্যানেল</button>
+        <button class="btn" style="background: var(--success);" onclick="financeLogin()">অর্থ সচিব</button>
+    </div>
+
+    <div id="adminPanel" class="admin-panel">
+        <h4 id="formTitle">নতুন ডোনার এন্ট্রি</h4>
+        <input type="text" id="dName" placeholder="নাম">
+        <input type="text" id="dGroup" placeholder="রক্তের গ্রুপ (যেমন: A+)">
+        <input type="tel" id="dPhone" placeholder="ফোন নাম্বার">
+        <input type="text" id="dImg" placeholder="ছবির লিঙ্ক (URL)">
+        <input type="date" id="dDate">
+        <button class="btn" style="background: var(--secondary); margin-top:10px;" onclick="saveDonor()">তথ্য সেভ করুন</button>
+    </div>
 </div>
+
 <script>
+    // Firebase Setup
     const firebaseConfig = { databaseURL: "https://ubc-database-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    let isAdmin = false;
+    let allDonors = [];
+
+    // --- তারিখ ও সময়ের লজিক ---
     function getBengaliSeason(month) {
         const seasons = ["শীত", "শীত", "বসন্ত", "বসন্ত", "গ্রীষ্ম", "গ্রীষ্ম", "বর্ষা", "বর্ষা", "শরৎ", "শরৎ", "হেমন্ত", "হেমন্ত"];
         return seasons[month];
@@ -57,36 +101,134 @@
     function updateDateTime() {
         const now = new Date();
         document.getElementById('liveClock').innerText = now.toLocaleTimeString('bn-BD');
+
+        // ইংরেজি
+        document.getElementById('enD').innerText = "📅 ইংরেজি: " + now.toLocaleDateString('bn-BD', {day:'numeric', month:'long', year:'numeric'}) + " (রোজ " + now.toLocaleDateString('bn-BD', {weekday:'long'}) + ")";
         
-        // ইংরেজি তারিখ
-        const enDate = now.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' });
-        const dayName = now.toLocaleDateString('bn-BD', { weekday: 'long' });
-        document.getElementById('enD').innerText = "📅 ইংরেজি: " + enDate + " খ্রী. (রোজ " + dayName + ")";
-        
-        // বাংলা তারিখ
-        const bnDate = now.toLocaleDateString('bn-BD-u-ca-bengali', { day: 'numeric', month: 'long', year: 'numeric' });
-        const season = getBengaliSeason(now.getMonth());
-        document.getElementById('bnD').innerText = "🌾 বাংলা: " + bnDate + " বঙ্গাব্দ (" + season + "কাল)";
-        
-        // হিজরি তারিখ
+        // বাংলা
+        const bnDate = now.toLocaleDateString('bn-BD-u-ca-bengali', {day:'numeric', month:'long', year:'numeric'});
+        document.getElementById('bnD').innerText = "🌾 বাংলা: " + bnDate + " (" + getBengaliSeason(now.getMonth()) + "কাল)";
+
+        // হিজরি
         const arParts = new Intl.DateTimeFormat('en-u-ca-islamic-uma', {day:'numeric', month:'numeric', year:'numeric'}).formatToParts(now);
         const arDay = parseInt(arParts.find(p => p.type === 'day').value).toLocaleString('bn-BD');
         const arMonth = hijriMonthsBN[parseInt(arParts.find(p => p.type === 'month').value) - 1];
         const arYear = parseInt(arParts.find(p => p.type === 'year').value).toLocaleString('bn-BD');
         document.getElementById('arD').innerText = "🌙 হিজরি: " + arDay + " " + arMonth + ", " + arYear + " হিজরি";
+
+        // দিবস ও দিন সংখ্যা
+        const start = new Date(now.getFullYear(), 0, 0);
+        const diff = Math.floor((now - start) / 86400000);
+        document.getElementById('dayCount').innerText = `বছরের ${diff.toLocaleString('bn-BD')} তম দিন`;
+
+        const events = {"21-2": "আন্তর্জাতিক মাতৃভাষা দিবস", "26-3": "মহান স্বাধীনতা দিবস", "14-4": "পহেলা বৈশাখ", "1-5": "মে দিবস", "16-12": "মহান বিজয় দিবস"};
+        const key = now.getDate() + "-" + (now.getMonth() + 1);
+        document.getElementById('eventToday').innerText = events[key] ? "🎊 দিবস: " + events[key] : "";
+    }
+
+    // --- ডাটাবেজ লজিক ---
+    function loadData() {
+        db.ref('donors').on('value', snap => {
+            allDonors = [];
+            snap.forEach(c => { allDonors.push({id: c.key, ...c.val()}); });
+            renderDonors();
+            updateReports();
+        });
+    }
+
+    function renderDonors() {
+        const list = document.getElementById('donorList');
+        list.innerHTML = "";
+        allDonors.forEach(d => {
+            const lastDate = new Date(d.lastDate);
+            const daysDiff = Math.floor((new Date() - lastDate) / 86400000);
+            const canDonate = daysDiff >= 90;
+
+            list.innerHTML += `
+                <div class="donor-card">
+                    <img src="${d.img || 'https://via.placeholder.com/70'}" class="donor-img">
+                    <div class="donor-info">
+                        <b>${d.name}</b>
+                        ${isAdmin ? `<small>🩸 ${d.group} | 📞 <a href="tel:${d.phone}" style="text-decoration:none; color:inherit;">${d.phone}</a></small>` : `<small style="color:#999;">তথ্য সুরক্ষিত</small>`}
+                        <small style="display:block; color:#666;">শেষ দান: ${new Date(d.lastDate).toLocaleDateString('bn-BD')}</small>
+                        ${canDonate ? `<span class="status-msg">❤️ সম্মানিত রক্তযোদ্ধা আপনার পুনরায় রক্ত দেওয়ার সময় হয়েছে</span>` : `<small style="font-size:11px; color:var(--success);">পরবর্তী দান: ${90 - daysDiff} দিন পর</small>`}
+                        ${isAdmin ? `<br><button onclick="deleteDonor('${d.id}')" style="color:red; border:none; background:none; cursor:pointer; font-size:11px;">মুছুন</button>` : ''}
+                    </div>
+                </div>`;
+        });
+    }
+
+    function saveDonor() {
+        const data = {
+            name: document.getElementById('dName').value,
+            group: document.getElementById('dGroup').value,
+            phone: document.getElementById('dPhone').value,
+            img: document.getElementById('dImg').value,
+            lastDate: document.getElementById('dDate').value
+        };
+        if(data.name && data.phone) {
+            db.ref('donors').push(data);
+            alert("সফলভাবে সংরক্ষিত!");
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+    }
+
+    function deleteDonor(id) {
+        if(confirm("আপনি কি নিশ্চিত?")) db.ref('donors').child(id).remove();
+    }
+
+    function filterDonors() {
+        const nameInput = document.getElementById('sName').value.toUpperCase();
+        const groupInput = document.getElementById('sGroup').value;
+        const cards = document.getElementsByClassName('donor-card');
+        
+        allDonors.forEach((d, i) => {
+            const match = d.name.toUpperCase().includes(nameInput) && (groupInput === "" || d.group === groupInput);
+            cards[i].style.display = match ? "flex" : "none";
+        });
+    }
+
+    function updateReports() {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        let d=0, m=0, y=0;
+        
+        allDonors.forEach(donor => {
+            if(donor.lastDate === today) d++;
+            if(donor.lastDate.startsWith(today.substring(0,7))) m++;
+            if(donor.lastDate.startsWith(today.substring(0,4))) y++;
+        });
+        
+        document.getElementById('repD').innerText = d.toLocaleString('bn-BD');
+        document.getElementById('repM').innerText = m.toLocaleString('bn-BD');
+        document.getElementById('repY').innerText = y.toLocaleString('bn-BD');
+    }
+
+    // --- সিকিউরিটি ---
+    function adminLogin() {
+        const pin = prompt("এডমিন পিন দিন:");
+        if(pin === "42546ubc") {
+            isAdmin = true;
+            document.getElementById('adminPanel').style.display = 'block';
+            renderDonors();
+            alert("এডমিন মোড চালু হয়েছে!");
+        } else alert("ভুল পিন!");
+    }
+
+    function financeLogin() {
+        const pin = prompt("অর্থ সচিব পিন দিন:");
+        if(pin === "4321") {
+            const amt = prompt("নতুন আয়/ব্যয় এন্ট্রি করুন (টাকা):");
+            if(amt) {
+                db.ref('finance').push({ amount: amt, date: new Date().toLocaleString() });
+                alert("হিসাব সংরক্ষিত!");
+            }
+        } else alert("ভুল পিন!");
     }
 
     setInterval(updateDateTime, 1000);
-    function loadData() {
-        db.ref('donors').on('value', snap => {
-            let list = document.getElementById('donorList'); list.innerHTML = "";
-            snap.forEach(c => {
-                let d = c.val();
-                list.innerHTML += `<div class="donor-card"><img src="${d.img || 'https://via.placeholder.com/60'}" class="donor-img"><div><b>${d.name}</b><br><small>গ্রুপ: ${d.group}</small></div></div>`;
-            });
-        });
-    }
     window.onload = () => { updateDateTime(); loadData(); };
 </script>
+
 </body>
 </html>
