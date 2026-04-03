@@ -3,206 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UBC - Clock & Blood Directory</title>
+    <title>UBC - Pro Blood Directory</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <style>
-        :root { --primary: #e63946; --secondary: #1d3557; --bg: #f8fafc; --success: #22c55e; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
-        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); min-height: 95vh; }
+        :root { --primary: #e63946; --secondary: #1d3557; --success: #2a9d8f; --accent: #ffb703; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 80px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
         
-        /* ঘড়ি ও ক্যালেন্ডার স্টাইল */
-        .clock-widget { background: var(--secondary); color: white; padding: 15px; border-radius: 20px; margin-bottom: 20px; text-align: center; }
-        #liveClock { font-size: 28px; font-weight: bold; margin-bottom: 5px; color: #facc15; }
-        .date-row { font-size: 13px; display: flex; justify-content: space-around; opacity: 0.9; }
+        /* Header */
+        .header { background: linear-gradient(135deg, var(--primary), #b91c1c); color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
+        .logo { width: 90px; height: 90px; border-radius: 50%; border: 3px solid white; margin-bottom: 8px; background: white; }
+        
+        /* Widgets */
+        .widget-box { background: #fff; margin: 10px; padding: 15px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .clock { font-size: 24px; font-weight: bold; color: var(--secondary); margin-bottom: 5px; }
+        .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; font-weight: bold; }
+        
+        .alert-text { background: #fff5f5; color: #d32f2f; padding: 12px; margin: 10px; border-radius: 12px; border: 1px solid #feb2b2; font-size: 13px; font-weight: bold; line-height: 1.5; }
 
-        .header { background: linear-gradient(135deg, var(--primary), #b91c1c); color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; text-align: center; }
-        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; font-size: 16px; transition: 0.2s; }
-        input, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; font-size: 15px; }
-        .donor-card { text-align: left; background: #fff; border: 1px solid #f1f5f9; padding: 15px; margin: 12px 0; border-radius: 15px; border-left: 6px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: none; }
-        .badge { background: var(--secondary); color: white; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: bold; float: right; }
-        .admin-view { display: none; margin-top: 20px; }
+        /* Search Boxes */
+        .search-container { padding: 0 10px; display: flex; gap: 10px; }
+        .search-container input, .search-container select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
+
+        /* Donor Card */
+        .donor-card { background: white; border: 1px solid #eee; margin: 10px; padding: 12px; border-radius: 15px; display: flex; align-items: center; position: relative; border-left: 5px solid var(--primary); }
+        .donor-img { width: 65px; height: 65px; border-radius: 12px; object-fit: cover; margin-right: 12px; background: #f0f0f0; }
+        .donor-info b { font-size: 16px; display: block; color: var(--secondary); }
+        .status-msg { color: #dc2626; font-size: 11px; font-weight: bold; margin-top: 4px; }
+
+        /* Reports */
+        .report-section { display: flex; justify-content: space-around; padding: 10px; background: var(--secondary); color: white; margin: 10px; border-radius: 12px; font-size: 11px; text-align: center; }
+
+        /* Finance Section */
+        .finance-panel { display: none; background: #f8f9fa; margin: 10px; padding: 15px; border-radius: 15px; border: 1px solid #ddd; }
+        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-p { background: var(--primary); color: white; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="clock-widget">
-        <div id="liveClock">00:00:00</div>
-        <div class="date-row">
-            <div id="enDate">EN Date</div>
-            <div id="bnDate">বাংলা তারিখ</div>
-            <div id="arDate">আরবি তারিখ</div>
-        </div>
-    </div>
-
     <div class="header">
+        <img src="https://i.ibb.co.com/FbYB4J3W/20241022-122323-removebg-preview.png" class="logo">
         <h2 style="margin:0;">উত্তর গ্রাম ব্লাড সার্কেল</h2>
-        <p style="margin:5px 0 0 0; font-size: 13px;">নিরাপদ রক্তদাতা ব্যবস্থাপনা</p>
+        <div id="liveClock" class="clock">00:00:00</div>
     </div>
 
-    <div id="userUI">
-        <button class="btn" style="background: var(--success);" onclick="toggleElement('regForm')">🩸 রক্তদাতা হিসেবে নাম লেখান</button>
-        
-        <div id="regForm" style="display:none; background: #fff1f2; padding: 15px; border-radius: 15px; border: 1px solid #fecaca; margin-bottom: 20px;">
-            <input type="text" id="name" placeholder="আপনার পূর্ণ নাম">
-            <input type="tel" id="phone" placeholder="মোবাইল নাম্বার">
-            <select id="group">
-                <option value="">রক্তের গ্রুপ</option>
-                <option value="A+">A+</option><option value="B+">B+</option><option value="O+">O+</option><option value="AB+">AB+</option>
-                <option value="A-">A-</option><option value="B-">B-</option><option value="O-">O-</option><option value="AB-">AB-</option>
-            </select>
-            <label style="font-size:12px; color:#666;">শেষ রক্তদানের তারিখ:</label>
-            <input type="date" id="lastDate">
-            <button class="btn" style="background: var(--primary);" onclick="sendToCloud()">তথ্য জমা দিন</button>
-        </div>
-
-        <div style="background: #f1f5f9; padding: 15px; border-radius: 15px; margin-bottom: 20px;">
-            <h4 style="margin:0 0 10px 0;">নিজের তথ্য খুঁজুন</h4>
-            <input type="text" id="userSearch" placeholder="আপনার নাম বা ফোন নাম্বার লিখুন..." onkeyup="userFilter()">
-            <p style="font-size: 11px; color: #666; margin-top: 5px;">সঠিক তথ্য দিলেই কেবল কার্ডটি দেখা যাবে।</p>
-        </div>
-
-        <div id="publicList">লোড হচ্ছে...</div>
+    <div class="alert-text">
+        📢 গর্ভবতী মায়ের ডেলিভারির সময় রক্তের প্রয়োজন হয়, তাই ডেলিভারির অন্তত এক মাস আগে থেকেই দুইজন রক্তদাতা জোগাড় করে রাখুন।
     </div>
 
-    <button class="btn" style="background: #94a3b8; margin-top: 40px; font-size: 12px;" onclick="checkAdmin()">🔒 এডমিন প্যানেল</button>
+    <div class="widget-box">
+        <div class="date-grid">
+            <div id="enD">লোড হচ্ছে...</div>
+            <div id="bnD">লোড হচ্ছে...</div>
+            <div id="arD">লোড হচ্ছে...</div>
+            <div id="dayN">লোড হচ্ছে...</div>
+        </div>
+        <div id="dayCount" style="font-size:11px; color:#666; margin-top:5px;"></div>
+        <div id="eventToday" style="font-size:13px; color:var(--primary); font-weight:bold; margin-top:5px;"></div>
+    </div>
 
-    <div id="adminPanel" class="admin-view">
-        <h3 style="color: var(--primary);">মাস্টার ডাটাবেস (এডমিন)</h3>
-        <input type="text" id="adminSearch" placeholder="নাম বা গ্রুপ দিয়ে সার্চ দিন..." onkeyup="adminFilter()">
-        <div id="adminDataList"></div>
-        <button class="btn" style="background: #1e293b;" onclick="location.reload()">লগআউট</button>
+    <div id="reportBox" class="report-section">
+        <div>আজকের ম্যানেজ<br><b id="repD">০</b></div>
+        <div>এই মাসে মোট<br><b id="repM">০</b></div>
+        <div>এই বছরে মোট<br><b id="repY">০</b></div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="sName" placeholder="🔍 নাম (ইংরেজিতে)..." onkeyup="filterDonors()">
+        <select id="sGroup" onchange="filterDonors()">
+            <option value="">🩸 গ্রুপ</option>
+            <option value="A+">A+</option><option value="B+">B+</option><option value="O+">O+</option><option value="AB+">AB+</option>
+            <option value="A-">A-</option><option value="B-">B-</option><option value="O-">O-</option><option value="AB-">AB-</option>
+        </select>
+    </div>
+
+    <div id="donorList">লোড হচ্ছে...</div>
+
+    <div style="padding: 15px; display: flex; gap: 10px;">
+        <button class="btn btn-p" onclick="adminLogin()">এডমিন প্যানেল</button>
+        <button class="btn" style="background:var(--success); color:white;" onclick="financeLogin()">অর্থ সচিব</button>
+    </div>
+
+    <div id="financeBox" class="finance-panel">
+        <h4>💰 আয়-ব্যয় হিসাব (পিন: ৪৩২১)</h4>
+        <input type="number" id="accAmt" placeholder="টাকার পরিমাণ">
+        <input type="text" id="accNote" placeholder="বিবরণ">
+        <select id="accType"><option value="in">আয় (+)</option><option value="out">ব্যয় (-)</option></select>
+        <button class="btn btn-p" onclick="saveAcc()">সংরক্ষণ করুন</button>
+        <div id="accList" style="margin-top:10px; font-size:12px;"></div>
     </div>
 </div>
 
 <script>
-    const dbURL = "https://ubc-database-default-rtdb.firebaseio.com/donors.json";
-    let allDonors = {};
+    // Firebase Config (আপনার দেওয়া লিঙ্ক অনুযায়ী)
+    const firebaseConfig = { databaseURL: "https://ubc-database-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    // লাইভ ঘড়ি ও তারিখ ফাংশন
-    function updateClock() {
+    // দিবস এবং তারিখ ফাংশন
+    function updateDateTime() {
         const now = new Date();
-        // ঘড়ি
         document.getElementById('liveClock').innerText = now.toLocaleTimeString('bn-BD');
+        document.getElementById('enD').innerText = "EN: " + now.toLocaleDateString('en-GB');
+        document.getElementById('bnD').innerText = "বাংলা: " + now.toLocaleDateString('bn-BD-u-ca-bengali');
+        document.getElementById('arD').innerText = "হিজরি: " + now.toLocaleDateString('ar-SA-u-ca-islamic-uma');
+        document.getElementById('dayN').innerText = "বার: " + now.toLocaleDateString('bn-BD', {weekday:'long'});
+
+        // বছরের দিন ও দিবস
+        const start = new Date(now.getFullYear(), 0, 0);
+        const dayOfYear = Math.floor((now - start) / 86400000);
+        document.getElementById('dayCount').innerText = `বছরের ${dayOfYear} তম দিন`;
         
-        // ইংরেজি তারিখ
-        const enOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('enDate').innerText = now.toLocaleDateString('en-GB', enOptions);
-        
-        // আরবি তারিখ
-        const arOptions = { day: 'numeric', month: 'long', year: 'numeric', calendar: 'islamic-uma' };
-        document.getElementById('arDate').innerText = now.toLocaleDateString('ar-SA-u-ca-islamic-uma', arOptions);
-
-        // বাংলা তারিখ (সহজ পদ্ধতি)
-        const bnOptions = { day: 'numeric', month: 'long', year: 'numeric' };
-        document.getElementById('bnDate').innerText = now.toLocaleDateString('bn-BD', bnOptions);
+        const events = {"21-2": "শহীদ দিবস", "26-3": "স্বাধীনতা দিবস", "14-6": "বিশ্ব রক্তদাতা দিবস", "16-12": "বিজয় দিবস"};
+        const key = now.getDate() + "-" + (now.getMonth()+1);
+        document.getElementById('eventToday').innerText = events[key] ? "🎊 দিবস: " + events[key] : "";
     }
-    setInterval(updateClock, 1000);
+    setInterval(updateDateTime, 1000);
 
-    function toggleElement(id) {
-        const el = document.getElementById(id);
-        el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+    // ডোনার ডাটা লোড
+    let allDonors = [];
+    function loadData() {
+        db.ref('donors').on('value', snap => {
+            allDonors = [];
+            snap.forEach(c => { allDonors.push({id: c.key, ...c.val()}); });
+            renderDonors(false);
+            countReports();
+        });
     }
 
-    async function loadData() {
-        try {
-            const res = await fetch(dbURL);
-            allDonors = await res.json() || {};
-            displayPublic();
-        } catch (e) { console.log("Load failed"); }
+    function renderDonors(isAdmin) {
+        const list = document.getElementById('donorList');
+        list.innerHTML = "";
+        allDonors.forEach(d => {
+            const days = Math.floor((new Date() - new Date(d.lastDate)) / 86400000);
+            const alertMsg = days >= 90 ? `<span class="status-msg">❤️ সম্মানিত রক্তযোদ্ধা আপনার পুনরায় রক্ত দেওয়ার সময় হয়েছে</span>` : `<small>রক্তদানের বয়স: ${days} দিন</small>`;
+            
+            list.innerHTML += `
+                <div class="donor-card" onclick="${isAdmin ? `manageDonor('${d.id}')` : ''}">
+                    <img src="${d.img || 'https://via.placeholder.com/60'}" class="donor-img">
+                    <div class="donor-info">
+                        <b>${d.name}</b>
+                        ${isAdmin ? `<small>🩸 ${d.group} | 📞 <a href="tel:${d.phone}">${d.phone}</a></small>` : `<small style="color:#888;">ব্যক্তিগত তথ্য সুরক্ষিত</small>`}
+                        ${alertMsg}
+                    </div>
+                </div>`;
+        });
     }
 
-    function displayPublic() {
-        const div = document.getElementById('publicList');
-        div.innerHTML = "";
-        for(let id in allDonors) {
-            let d = allDonors[id];
-            const days = calculateDays(d.lastDate);
-            div.innerHTML += `
-                <div class="donor-card user-card" data-key="${d.name} ${d.phone}">
-                    <span class="badge">${d.group}</span>
-                    <b style="font-size: 18px; color: var(--secondary);">${d.name}</b><br>
-                    <p style="margin: 10px 0 0 0; font-size: 14px;">
-                        <span style="color:#64748b; font-weight:bold;">রক্তদানের পর অতিবাহিত:</span> <span style="color:red; font-weight:bold;">${days} দিন</span><br>
-                        <span style="color:#64748b; font-weight:bold;">মোবাইল:</span> ${d.phone}
-                    </p>
-                </div>
-            `;
-        }
+    function filterDonors() {
+        const name = document.getElementById('sName').value.toUpperCase();
+        const group = document.getElementById('sGroup').value;
+        const cards = document.getElementsByClassName('donor-card');
+        allDonors.forEach((d, i) => {
+            const match = d.name.toUpperCase().includes(name) && (group === "" || d.group === group);
+            cards[i].style.display = match ? "flex" : "none";
+        });
     }
 
-    function userFilter() {
-        const q = document.getElementById('userSearch').value.trim().toUpperCase();
-        const cards = document.getElementsByClassName('user-card');
-        for(let card of cards) {
-            if(q.length > 2 && card.getAttribute('data-key').toUpperCase().includes(q)) {
-                card.style.display = "block";
-            } else { card.style.display = "none"; }
-        }
+    // রিপোর্ট কাউন্ট (সন্ধ্যা ৭টার লজিকসহ)
+    function countReports() {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        let d=0, m=0, y=0;
+        allDonors.forEach(donor => {
+            if(donor.lastDate === today) d++;
+            if(donor.lastDate.startsWith(today.substring(0,7))) m++;
+            if(donor.lastDate.startsWith(today.substring(0,4))) y++;
+        });
+        document.getElementById('repD').innerText = d;
+        document.getElementById('repM').innerText = m;
+        document.getElementById('repY').innerText = y;
     }
 
-    function calculateDays(dateString) {
-        const last = new Date(dateString);
-        const today = new Date();
-        const diff = today - last;
-        return Math.floor(diff / (1000 * 60 * 60 * 24));
-    }
-
-    async function sendToCloud() {
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const group = document.getElementById('group').value;
-        const lastDate = document.getElementById('lastDate').value;
-        if(!name || !phone || !group || !lastDate) return alert("সব তথ্য পূরণ করুন!");
-        const data = { name, phone, group, lastDate };
-        try {
-            await fetch(dbURL, { method: 'POST', body: JSON.stringify(data) });
-            alert("সংরক্ষিত হয়েছে!");
-            location.reload();
-        } catch (e) { alert("ব্যর্থ হয়েছে!"); }
-    }
-
-    function checkAdmin() {
+    // এডমিন ও অর্থ সচিব লগইন
+    function adminLogin() {
         const pin = prompt("এডমিন পিন দিন:");
-        if(pin === "42546ubc") {
-            document.getElementById('userUI').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            displayAdmin();
-        } else { alert("ভুল পিন!"); }
+        if(pin === "42546ubc") { renderDonors(true); alert("এডমিন মোড চালু হয়েছে। এখন আপনি সব তথ্য দেখতে ও কল করতে পারবেন।"); }
+        else alert("ভুল পিন!");
     }
 
-    function displayAdmin() {
-        const div = document.getElementById('adminDataList');
-        div.innerHTML = "";
-        for(let id in allDonors) {
-            let d = allDonors[id];
-            div.innerHTML += `
-                <div class="donor-card admin-card" style="display:block; border-left-color: #22c55e;" data-key="${d.name} ${d.group}">
-                    <span class="badge" style="background:#22c55e">${d.group}</span>
-                    <b>${d.name}</b><br>
-                    📞 <a href="tel:${d.phone}" style="color:var(--primary); font-weight:bold;">${d.phone}</a><br>
-                    📅 তারিখ: ${d.lastDate}<br>
-                    <button onclick="deleteEntry('${id}')" style="margin-top:10px; color:red; border:1px solid red; background:none; padding:4px; border-radius:5px; cursor:pointer;">ডিলিট</button>
-                </div>
-            `;
+    function financeLogin() {
+        const pin = prompt("অর্থ সচিব পিন দিন:");
+        if(pin === "4321") document.getElementById('financeBox').style.display = 'block';
+        else alert("ভুল পিন!");
+    }
+
+    // আয়-ব্যয় সেভ
+    function saveAcc() {
+        const amt = document.getElementById('accAmt').value;
+        const note = document.getElementById('accNote').value;
+        const type = document.getElementById('accType').value;
+        if(amt && note) {
+            db.ref('finance').push({ amt, note, type, date: new Date().toLocaleString('bn-BD') });
+            alert("হিসাব সংরক্ষিত!");
         }
     }
 
-    function adminFilter() {
-        const q = document.getElementById('adminSearch').value.toUpperCase();
-        const cards = document.getElementsByClassName('admin-card');
-        for(let card of cards) {
-            card.getAttribute('data-key').toUpperCase().includes(q) ? card.style.display="block" : card.style.display="none";
-        }
-    }
-
-    async function deleteEntry(id) {
-        if(confirm("মুছে ফেলবেন?")) {
-            await fetch(`https://ubc-database-default-rtdb.firebaseio.com/donors/${id}.json`, { method: 'DELETE' });
-            location.reload();
-        }
-    }
-
-    window.onload = () => { loadData(); updateClock(); };
+    window.onload = () => { updateDateTime(); loadData(); };
 </script>
 </body>
 </html>
